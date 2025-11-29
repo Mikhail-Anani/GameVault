@@ -66,8 +66,11 @@ export default function GameCard({ game }: GameCardProps) {
             <FaStar className="text-yellow-400" />
             <span className="font-semibold text-white">
               {(() => {
-                const rating = typeof game.average_rating === 'number' ? game.average_rating : parseFloat(game.average_rating);
-                return rating && !isNaN(rating) ? rating.toFixed(1) : 'N/A';
+                if (game.average_rating == null) return 'N/A';
+                const rating = typeof game.average_rating === 'number' 
+                  ? game.average_rating 
+                  : (typeof game.average_rating === 'string' ? parseFloat(game.average_rating) : 0);
+                return !isNaN(rating) && isFinite(rating) && rating > 0 ? rating.toFixed(1) : 'N/A';
               })()}
             </span>
             {game.rating_count !== undefined && game.rating_count > 0 && (

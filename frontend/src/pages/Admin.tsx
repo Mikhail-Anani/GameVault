@@ -37,9 +37,12 @@ export default function Admin() {
       const response = await gamesApi.getAll();
       const games = (response.data || []).map((game: any) => ({
         ...game,
-        average_rating: typeof game.average_rating === 'number' 
-          ? game.average_rating 
-          : (parseFloat(game.average_rating) || 0),
+        average_rating: (() => {
+          if (game.average_rating == null) return 0;
+          if (typeof game.average_rating === 'number') return game.average_rating;
+          const parsed = parseFloat(game.average_rating);
+          return !isNaN(parsed) && isFinite(parsed) ? parsed : 0;
+        })(),
         rating_count: typeof game.rating_count === 'number' 
           ? game.rating_count 
           : (parseInt(game.rating_count) || 0),
@@ -196,8 +199,11 @@ export default function Admin() {
                   <td className="py-3 px-4 text-gray-300">{game.platform || '-'}</td>
                   <td className="py-3 px-4 text-gray-300">
                     {(() => {
-                      const rating = typeof game.average_rating === 'number' ? game.average_rating : parseFloat(game.average_rating);
-                      return rating && !isNaN(rating) ? rating.toFixed(1) : '-';
+                      if (game.average_rating == null) return '-';
+                      const rating = typeof game.average_rating === 'number' 
+                        ? game.average_rating 
+                        : (typeof game.average_rating === 'string' ? parseFloat(game.average_rating) : 0);
+                      return !isNaN(rating) && isFinite(rating) && rating > 0 ? rating.toFixed(1) : '-';
                     })()}
                   </td>
                   <td className="py-3 px-4">

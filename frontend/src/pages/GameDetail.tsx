@@ -116,7 +116,17 @@ export default function GameDetail() {
       setError(null);
       const response = await gamesApi.getById(parseInt(id));
       if (response && response.data) {
-        setGame(response.data);
+        const gameData = {
+          ...response.data,
+          average_rating: (() => {
+            const rating = response.data.average_rating;
+            if (rating == null) return 0;
+            if (typeof rating === 'number') return rating;
+            const parsed = parseFloat(rating);
+            return !isNaN(parsed) && isFinite(parsed) ? parsed : 0;
+          })(),
+        };
+        setGame(gameData);
         setError(null);
       } else {
         setError('Jeu non trouvé');
@@ -130,7 +140,17 @@ export default function GameDetail() {
         try {
           const response = await gamesApi.getById(parseInt(id));
           if (response && response.data) {
-            setGame(response.data);
+            const gameData = {
+              ...response.data,
+              average_rating: (() => {
+                const rating = response.data.average_rating;
+                if (rating == null) return 0;
+                if (typeof rating === 'number') return rating;
+                const parsed = parseFloat(rating);
+                return !isNaN(parsed) && isFinite(parsed) ? parsed : 0;
+              })(),
+            };
+            setGame(gameData);
             setError(null);
             return;
           }
@@ -217,7 +237,16 @@ export default function GameDetail() {
     if (!id) return;
     try {
       const response = await gamesApi.getRecommendations(parseInt(id));
-      setRecommendations(Array.isArray(response?.data) ? response.data : []);
+      const recommendations = Array.isArray(response?.data) ? response.data : [];
+      setRecommendations(recommendations.map((rec: any) => ({
+        ...rec,
+        average_rating: (() => {
+          if (rec.average_rating == null) return 0;
+          if (typeof rec.average_rating === 'number') return rec.average_rating;
+          const parsed = parseFloat(rec.average_rating);
+          return !isNaN(parsed) && isFinite(parsed) ? parsed : 0;
+        })(),
+      })));
     } catch {
       setRecommendations([]);
     }
@@ -237,7 +266,17 @@ export default function GameDetail() {
       try {
         const response = await gamesApi.getById(parseInt(id));
         if (response && response.data) {
-          setGame(response.data);
+          const gameData = {
+            ...response.data,
+            average_rating: (() => {
+              const rating = response.data.average_rating;
+              if (rating == null) return 0;
+              if (typeof rating === 'number') return rating;
+              const parsed = parseFloat(rating);
+              return !isNaN(parsed) && isFinite(parsed) ? parsed : 0;
+            })(),
+          };
+          setGame(gameData);
         }
       } catch {
         // Ignore errors when refreshing game data after rating
@@ -380,8 +419,11 @@ export default function GameDetail() {
                 <FaStar className="text-yellow-400 text-2xl" />
                 <span className="text-2xl font-bold">
                   {(() => {
-                    const rating = typeof finalGame.average_rating === 'number' ? finalGame.average_rating : parseFloat(finalGame.average_rating);
-                    return rating && !isNaN(rating) ? rating.toFixed(1) : 'N/A';
+                    if (finalGame.average_rating == null) return 'N/A';
+                    const rating = typeof finalGame.average_rating === 'number' 
+                      ? finalGame.average_rating 
+                      : (typeof finalGame.average_rating === 'string' ? parseFloat(finalGame.average_rating) : 0);
+                    return !isNaN(rating) && isFinite(rating) && rating > 0 ? rating.toFixed(1) : 'N/A';
                   })()}
                 </span>
                 {finalGame.rating_count !== undefined && finalGame.rating_count > 0 && (
@@ -528,8 +570,11 @@ export default function GameDetail() {
                       <div className="flex items-center space-x-1 mt-1">
                         <FaStar className="text-yellow-400 text-sm" />
                         <span className="text-sm text-gray-300">{(() => {
-                          const rating = typeof rec.average_rating === 'number' ? rec.average_rating : parseFloat(rec.average_rating);
-                          return rating && !isNaN(rating) ? rating.toFixed(1) : '0.0';
+                          if (rec.average_rating == null) return '0.0';
+                          const rating = typeof rec.average_rating === 'number' 
+                            ? rec.average_rating 
+                            : (typeof rec.average_rating === 'string' ? parseFloat(rec.average_rating) : 0);
+                          return !isNaN(rating) && isFinite(rating) && rating > 0 ? rating.toFixed(1) : '0.0';
                         })()}</span>
                       </div>
                     )}

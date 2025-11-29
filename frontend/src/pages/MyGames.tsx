@@ -33,9 +33,12 @@ export default function MyGames() {
           .filter((game: any) => gameIds.includes(game.id))
           .map((game: any) => ({
             ...game,
-            average_rating: typeof game.average_rating === 'number' 
-              ? game.average_rating 
-              : (parseFloat(game.average_rating) || 0),
+            average_rating: (() => {
+              if (game.average_rating == null) return 0;
+              if (typeof game.average_rating === 'number') return game.average_rating;
+              const parsed = parseFloat(game.average_rating);
+              return !isNaN(parsed) && isFinite(parsed) ? parsed : 0;
+            })(),
             rating_count: typeof game.rating_count === 'number' 
               ? game.rating_count 
               : (parseInt(game.rating_count) || 0),
