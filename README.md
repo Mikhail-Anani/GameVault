@@ -18,6 +18,9 @@ Application web permettant aux utilisateurs de noter, commenter et gérer leur l
 ## Démarrage Rapide
 
 ### 1. Cloner le projet
+
+Il est important de cloner le projet au lieu de le télécharger en zip pour éviter la perte des dépendances
+
 ```bash
 git clone <votre-repo>
 cd projet_docker
